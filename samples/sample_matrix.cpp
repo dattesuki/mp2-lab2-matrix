@@ -26,7 +26,20 @@ int main()
   cout << "Matrix a = " << endl << a << endl;
   cout << "Matrix b = " << endl << b << endl;
   cout << "Matrix c = a + b" << endl << c << endl;
-
+  //тесты для CRS
+  TDynamicMatrixCRS<int> a_CRS(a);
+  cout << "Matrix a in CRS = " << endl << a_CRS << endl;
+  cout << "Matrix a in CRS in the form of a dense matrix = " << endl << (TDynamicMatrix<int>)a_CRS << endl;
+  TDynamicMatrix<int> d(5);
+  for (i = 0; i < 5; i++)
+      for (j = i; j < 5; j++)
+          d[i][j] = i+1;
+  cout << "Matrix d = \n"<<d << endl;
+  cout << "Matrix a*d = \n" << (a * d) << endl;
+  cout << "Matrix a_CRS*d = \n" << (a_CRS * d) << endl;
+  cout << "Matrix d*a = \n" << (d * a) << endl;
+  cout << "Matrix d*a_CRS = \n" << (d * a_CRS) << endl;
+  
   return 0;
 }
 //---------------------------------------------------------------------------
