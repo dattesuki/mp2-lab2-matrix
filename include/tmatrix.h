@@ -1,4 +1,4 @@
-﻿// ННГУ, ИИТММ, Курс "Алгоритмы и структуры данных"
+// ННГУ, ИИТММ, Курс "Алгоритмы и структуры данных"
 //
 // Copyright (c) Сысоев А.В.
 //
@@ -37,19 +37,40 @@ public:
   }
   TDynamicVector(const TDynamicVector& v)
   {
+      sz=v.sz;
+      pMem=new T[sz];
+      for (int i = 0; i<sz; ++i) pMem[i] = v.pMem[i];
   }
   TDynamicVector(TDynamicVector&& v) noexcept
   {
+      sz = 0;
+      pMem = nullptr;
+      swap(*this,v);
   }
   ~TDynamicVector()
   {
+      delete [] pMem;
+      pMem = nullptr;
   }
   TDynamicVector& operator=(const TDynamicVector& v)
   {
+      if (v != *this){
+          if (sz!=v.sz){
+              delete [] pMem;
+              sz=v.sz;
+              pMem = new T[sz];
+          }
+          for (int i = 0; i < sz; ++i) pMem[i]=v.pMem[i];
+      }
+      return *this;
   }
   TDynamicVector& operator=(TDynamicVector&& v) noexcept
   {
-      return (*this); // заглушка
+      if (*this == v) throw logic_error("error");
+      sz = 0;
+      pMem = nullptr;
+      swap(*this,v);
+      return (*this);
   }
 
   size_t size() const noexcept { return sz; }
@@ -57,46 +78,77 @@ public:
   // индексация
   T& operator[](size_t ind)
   {
+      return pMem[ind];
   }
   const T& operator[](size_t ind) const
   {
+      return pMem[ind];
   }
   // индексация с контролем
   T& at(size_t ind)
   {
+      if (ind<0 || ind>=sz) throw range_error("range error");
+      return pMem[ind];
   }
   const T& at(size_t ind) const
   {
+      if (ind<0 || ind>=sz) throw range_error("range error");
+      return pMem[ind];
   }
 
   // сравнение
   bool operator==(const TDynamicVector& v) const noexcept
-  {
-  }
+    {
+        if (sz!=v.sz) return false;
+        for (int i=0;i<sz;++i) if (pMem[i]!=v.pMem[i]) return false;
+        return true;
+    }
   bool operator!=(const TDynamicVector& v) const noexcept
   {
+      return (!(*this == v));
   }
 
   // скалярные операции
   TDynamicVector operator+(T val)
   {
+      TDynamicVector Result(*this);
+      for (int i = 0; i<sz;i++) Result.pMem[i]+=val;
+      return Result;
   }
   TDynamicVector operator-(T val)
   {
+      TDynamicVector Result(*this);
+      for (int i = 0; i<sz;i++) Result.pMem[i]-=val;
+      return Result;
   }
   TDynamicVector operator*(T val)
   {
+      TDynamicVector Result(*this);
+      for (int i = 0; i<sz;i++) Result.pMem[i]*=val;
+      return Result;
   }
-
+    
   // векторные операции
   TDynamicVector operator+(const TDynamicVector& v)
   {
+      if (sz!=v.sz) throw length_error("length error");
+      TDynamicVector Result(*this);
+      for (int i=0;i<sz;++i) Result+=v.pMem[i];
+      return Result;
   }
   TDynamicVector operator-(const TDynamicVector& v)
   {
+      if (sz!=v.sz) throw length_error("length error");
+      TDynamicVector Result(*this);
+      for (int i=0;i<sz;++i) Result-=v.pMem[i];
+      return Result;
   }
   T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
   {
+      if (sz!=v.sz) throw length_error("length error");
+      T sum = T(); //конструктор по умолчанию
+      for (int i=0;i<sz;++i) sum+=(pMem[i]*v.pMem[i]);
+      return sum;
   }
 
   friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
@@ -124,18 +176,18 @@ public:
 // Динамическая матрица - 
 // шаблонная матрица на динамической памяти
 template<typename T>
-class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
+class TDynamicMatrix : private TDynamicVector<TDynamicVector<T> >
 {
-  using TDynamicVector<TDynamicVector<T>>::pMem;
-  using TDynamicVector<TDynamicVector<T>>::sz;
+  using TDynamicVector<TDynamicVector<T> >::pMem;
+  using TDynamicVector<TDynamicVector<T> >::sz;
 public:
-  TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
+  TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T> >(s)
   {
     for (size_t i = 0; i < sz; i++)
       pMem[i] = TDynamicVector<T>(sz);
   }
 
-  using TDynamicVector<TDynamicVector<T>>::operator[];
+  using TDynamicVector<TDynamicVector<T> >::operator[];
 
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
