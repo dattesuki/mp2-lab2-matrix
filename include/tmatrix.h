@@ -154,7 +154,7 @@ public:
       for (size_t i=0;i<sz;++i) Result[i] = Result[i] - v.pMem[i];
       return Result;
   }
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+  T operator*(const TDynamicVector& v) 
   {
       if (sz!=v.sz) throw length_error("length error");
       T sum = T(); //конструктор по умолчанию
@@ -202,6 +202,8 @@ public:
   }
 
   using TDynamicVector<TDynamicVector<T> >::operator[];
+  using TDynamicVector<TDynamicVector<T> >::at;
+  size_t size() const noexcept { return sz; }
 
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
@@ -262,7 +264,7 @@ public:
       for (size_t i = 0; i < sz; ++i) {
           for (size_t k = 0; k < sz; ++k) {
               for (size_t j = 0; j < sz; ++j) {
-                  Res.pMem[i][j] = Res.pMem[i][j] + pMem[i][k] * m.pMem[k][j];
+                  Res.pMem[i][j] = Res.pMem[i][j] + (pMem[i][k] * m.pMem[k][j]);
               }
           }
       }
@@ -279,7 +281,7 @@ public:
   }
   friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& m)
   {
-      for (size_t row = 0; row < m.sz; ++row) cout << m.pMem[row] << endl;
+      for (size_t row = 0; row < m.sz; ++row) ostr << m.pMem[row] << endl;
       return ostr;
   }
   //для реализации CRS
@@ -396,6 +398,14 @@ public:
         return *this;
     }
 
+    bool operator==(const TDynamicMatrixCRS& m) const{
+        if (value != m.value || rowIndex != m.rowIndex || col!=m.col) return 0;
+        return 1;
+    }
+    bool operator!=(const TDynamicMatrixCRS& m) const {
+        return !(*this==m);
+    }
+
     TDynamicMatrixCRS operator=(const TDynamicMatrixCRS& m) {
         if (*this != m) {
             value.clear();
@@ -405,7 +415,7 @@ public:
             rowIndex = m.rowIndex;
             col = m.col;
         }
-        return *this
+        return *this;
     }
 
     // ввод/вывод
@@ -416,6 +426,8 @@ public:
         m = temp;
         return istr;
     }
+
+    size_t size() const { return rowIndex.size() - 1; }
 
     friend ostream& operator<<(ostream& ostr, const TDynamicMatrixCRS<T>& m)
     {
