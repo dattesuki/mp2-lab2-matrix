@@ -39,7 +39,13 @@ int main()
   cout << "Matrix a_CRS*d = \n" << (a_CRS * d) << endl;
   cout << "Matrix d*a = \n" << (d * a) << endl;
   cout << "Matrix d*a_CRS = \n" << (d * a_CRS) << endl;
-  
+  TDynamicVector<int> A(5);
+  A[1] = 1;
+  A[3] = 6;
+  cout << a<<endl;
+  cout << A<<endl;
+  cout << (TDynamicMatrixCRS<int>)a_CRS * A << endl;
+  cout << a_CRS * A<<endl;
   return 0;
 }
 //---------------------------------------------------------------------------

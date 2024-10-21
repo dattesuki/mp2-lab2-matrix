@@ -154,7 +154,7 @@ public:
       for (size_t i=0;i<sz;++i) Result[i] = Result[i] - v.pMem[i];
       return Result;
   }
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+  T operator*(const TDynamicVector& v) 
   {
       if (sz!=v.sz) throw length_error("length error");
       T sum = T(); //конструктор по умолчанию
@@ -202,6 +202,8 @@ public:
   }
 
   using TDynamicVector<TDynamicVector<T> >::operator[];
+  using TDynamicVector<TDynamicVector<T> >::at;
+  size_t size() const noexcept { return sz; }
 
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
@@ -226,11 +228,11 @@ public:
   // матрично-векторные операции
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
-      if (sz != v.sz) throw range_error("range_error");
+      if (size() != v.size()) throw range_error("range_error");
       TDynamicVector<T> Res(sz);
       for (size_t i = 0; i < sz; ++i) {
           for (size_t j = 0; j < sz; ++j) {
-              Res[i] += pMem[i][j] * v.[j];
+              Res[i] += pMem[i][j] * v[j];
           }
       }
       return Res;
@@ -262,7 +264,7 @@ public:
       for (size_t i = 0; i < sz; ++i) {
           for (size_t k = 0; k < sz; ++k) {
               for (size_t j = 0; j < sz; ++j) {
-                  Res.pMem[i][j] = Res.pMem[i][j] + pMem[i][k] * m.pMem[k][j];
+                  Res.pMem[i][j] = Res.pMem[i][j] + (pMem[i][k] * m.pMem[k][j]);
               }
           }
       }
@@ -279,24 +281,11 @@ public:
   }
   friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& m)
   {
-      for (size_t row = 0; row < m.sz; ++row) cout << m.pMem[row] << endl;
+      for (size_t row = 0; row < m.sz; ++row) ostr << m.pMem[row] << endl;
       return ostr;
   }
   //для реализации CRS
   friend class TDynamicMatrixCRS<T>;
-  friend TDynamicMatrix<T> operator*(const TDynamicMatrixCRS<T>& m) {
-      TDynamicMatrix<T> Res(sz);
-      size_t len = m.rowIndex.size() - 1;
-      if (len != sz) throw logic_error("different length");
-      for (size_t i = 0; i < len; ++i) {
-          for (size_t j = m.rowIndex[i]; j < m.rowIndex[i + 1]; ++j) {
-              for (size_t k = 0; k < len; ++k) {
-                  Res[k][col[j]] = Res[k][col[j]] + m.value[j] * pMem[k][i];
-              }
-          }
-      }
-      return Res;
-  }
 };
 
 
@@ -336,7 +325,7 @@ public:
     TDynamicMatrixCRS operator*(const T& val)
     {
         TDynamicMatrixCRS Res(*this);
-        for (size_t i = 0; i < value.size(), ++i) Res.value[i] = Res.value[i] * val;
+        for (size_t i = 0; i < value.size(); ++i) Res.value[i] = Res.value[i] * val;
         return Res;
     }
 
@@ -345,11 +334,11 @@ public:
         TDynamicVector<T> Res(rowIndex.size()-1);
         if (v.sz != (rowIndex.size() - 1)) throw logic_error("different length");
         for (size_t i = 0; i < rowIndex.size() - 1; ++i) {
-            for (size_t j = rowIndex[i]; j < rowIndex[i + 1]; ++j) Res[i] = Res[i] + (value[j] * v.pMem[i]);
+            for (size_t j = rowIndex[i]; j < rowIndex[i + 1]; ++j) Res[i] = Res[i] + (value[j] * v.pMem[col[j]]);
         }
         return Res;
     }
-
+    
     TDynamicMatrix<T> operator*(const TDynamicMatrix<T>& m) {
         TDynamicMatrix<T> Res(rowIndex.size() - 1);
         if (m.sz != (rowIndex.size() - 1)) throw logic_error("different length");
@@ -381,9 +370,9 @@ public:
         col.clear();
 
         size_t temp = 0;
-        for (size_t row = 0; row < m.sz; ++row) {
+        for (size_t row = 0; row < m.size(); ++row) {
             rowIndex.push_back(temp);
-            for (size_t column = 0; column < m.sz; ++column) {
+            for (size_t column = 0; column < m.size(); ++column) {
                 if (m[row][column] != T()) {
                     value.push_back(m[row][column]);
                     col.push_back(column);
@@ -396,7 +385,15 @@ public:
         return *this;
     }
 
-    TDynamicMatrixCRS operator=(const TDynamicMatrixCRS& m) {
+    bool operator==(const TDynamicMatrixCRS& m) const{
+        if (value != m.value || rowIndex != m.rowIndex || col!=m.col) return 0;
+        return 1;
+    }
+    bool operator!=(const TDynamicMatrixCRS& m) const {
+        return !(*this==m);
+    }
+
+    TDynamicMatrixCRS& operator=(const TDynamicMatrixCRS& m) {
         if (*this != m) {
             value.clear();
             rowIndex.clear();
@@ -405,7 +402,7 @@ public:
             rowIndex = m.rowIndex;
             col = m.col;
         }
-        return *this
+        return *this;
     }
 
     // ввод/вывод
@@ -416,6 +413,8 @@ public:
         m = temp;
         return istr;
     }
+
+    size_t size() const { return rowIndex.size() - 1; }
 
     friend ostream& operator<<(ostream& ostr, const TDynamicMatrixCRS<T>& m)
     {
