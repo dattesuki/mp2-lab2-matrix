@@ -232,7 +232,7 @@ public:
       TDynamicVector<T> Res(sz);
       for (size_t i = 0; i < sz; ++i) {
           for (size_t j = 0; j < sz; ++j) {
-              Res[i] += pMem[i][j] * v.[j];
+              Res[i] += pMem[i][j] * v[j];
           }
       }
       return Res;
@@ -293,7 +293,8 @@ public:
       for (size_t i = 0; i < len; ++i) {
           for (size_t j = m.rowIndex[i]; j < m.rowIndex[i + 1]; ++j) {
               for (size_t k = 0; k < len; ++k) {
-                  Res[k][col[j]] = Res[k][col[j]] + m.value[j] * pMem[k][i];
+                  size_t tempcol= col[j]
+                  Res[k][tempcol] = Res[k][tempcol] + m.value[j] * pMem[k][i];
               }
           }
       }
@@ -338,7 +339,7 @@ public:
     TDynamicMatrixCRS operator*(const T& val)
     {
         TDynamicMatrixCRS Res(*this);
-        for (size_t i = 0; i < value.size(), ++i) Res.value[i] = Res.value[i] * val;
+        for (size_t i = 0; i < value.size(); ++i) Res.value[i] = Res.value[i] * val;
         return Res;
     }
 
