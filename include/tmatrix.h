@@ -364,7 +364,7 @@ public:
         return Res;
     }
 
-    TDynamicMatrixCRS operator=(const TDynamicMatrix<T>& m) {
+    TDynamicMatrixCRS& operator=(const TDynamicMatrix<T>& m) {
         value.clear();
         rowIndex.clear();
         col.clear();
