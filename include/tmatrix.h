@@ -181,7 +181,7 @@ public:
       ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
     return ostr;
   }
-  //friend class TDynamicMatrixCRS<T>;
+  friend class TDynamicMatrixCRS<T>;
 };
 
 
@@ -285,13 +285,12 @@ public:
       return ostr;
   }
   //для реализации CRS
-  //friend class TDynamicMatrixCRS<T>;
+  friend class TDynamicMatrixCRS<T>;
 };
 
 
 
 //Разрежанная матрица в формате CRS
-/*
 template<typename T>
 class TDynamicMatrixCRS
 {
@@ -301,14 +300,14 @@ class TDynamicMatrixCRS
 public:
     TDynamicMatrixCRS(){}
 
-    TDynamicMatrixCRS(TDynamicMatrixCRS& m) {
+    TDynamicMatrixCRS(const TDynamicMatrixCRS& m) {
         value = m.value;
         col = m.col;
         rowIndex = m.rowIndex;
     }
     TDynamicMatrixCRS(vector<T> _value, vector<size_t> _rowIndex, vector<size_t> _col):value(_value), rowIndex(_rowIndex), col(_col) {}
 
-    TDynamicMatrixCRS(TDynamicMatrix<T> m) {
+    TDynamicMatrixCRS(const TDynamicMatrix<T>& m) {
         size_t temp = 0;
         for (size_t row = 0; row < m.sz; ++row) {
             rowIndex.push_back(temp);
@@ -429,5 +428,5 @@ public:
         return ostr;
     }
     
-};*/
+};
 #endif
