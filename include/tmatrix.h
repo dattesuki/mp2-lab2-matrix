@@ -181,7 +181,7 @@ public:
       ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
     return ostr;
   }
-  friend class TDynamicMatrixCRS<T>;
+  //friend class TDynamicMatrixCRS<T>;
 };
 
 
@@ -285,12 +285,13 @@ public:
       return ostr;
   }
   //для реализации CRS
-  friend class TDynamicMatrixCRS<T>;
+  //friend class TDynamicMatrixCRS<T>;
 };
 
 
 
 //Разрежанная матрица в формате CRS
+/*
 template<typename T>
 class TDynamicMatrixCRS
 {
@@ -428,5 +429,5 @@ public:
         return ostr;
     }
     
-};
+};*/
 #endif

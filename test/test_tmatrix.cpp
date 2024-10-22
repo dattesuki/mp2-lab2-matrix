@@ -207,7 +207,7 @@ TEST(TDynamicMatrix, res_mult_matrix)
 
 
 
-
+/*
 
 //тесты для CRS
 
@@ -296,4 +296,4 @@ TEST(TDynamicMatrixCRS, res_mult_matrix2)
 	v3[2][2] = 150;
 	TDynamicMatrixCRS<int> v2_CRS = v2;
 	EXPECT_EQ((v1 * v2_CRS), v3);
-}
+}*/
